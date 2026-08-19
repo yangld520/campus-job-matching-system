@@ -287,6 +287,9 @@ route('GET', '/api/dashboard', async (req, res) => sendJSON(res, 200, buildDashb
 // 重置（演示用）
 route('POST', '/api/reset', async (req, res) => { db.reset(); sendJSON(res, 200, { ok: true }); });
 
+// 数据库诊断
+route('GET', '/api/db-status', async (req, res) => sendJSON(res, 200, db.dbStatus()));
+
 // ---------- 请求分发 ----------
 const server = http.createServer(async (req, res) => {
   const parsed = new URL(req.url, 'http://localhost');

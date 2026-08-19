@@ -9,6 +9,7 @@ const path = require('path');
 const DATA_FILE = path.join(__dirname, 'data.json');
 let cache = null;      // 内存中的单一状态对象
 let pool = null;       // pg 连接池（懒加载）
+let lastDbError = null; // 最近一次数据库连接错误（便于诊断）
 
 function now() { return new Date().toISOString(); }
 function gid(prefix) { return prefix + '_' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4); }
@@ -139,6 +140,7 @@ async function init() {
       return;
     } catch (e) {
       console.error('[db] ⚠️ Postgres 不可用，降级到本地 JSON 文件:', e.message);
+      lastDbError = e.message;
       pool = null;
     }
   }
@@ -197,5 +199,6 @@ module.exports = {
     return false;
   },
   reset: () => { cache = defaultData(); seed(cache); save(); return cache; },
-  usingDatabase: () => !!pool
+  usingDatabase: () => !!pool,
+  dbStatus: () => ({ usingDatabase: !!pool, databaseUrlSet: !!process.env.DATABASE_URL, lastError: lastDbError })
 };
