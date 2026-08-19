@@ -94,9 +94,13 @@ function buildPositionTags(p) {
 function getPool() {
   if (!pool) {
     const { Pool } = require('pg');
+    const cs = process.env.DATABASE_URL || '';
+    // 内部主机名（仅实例 id，如 dpg-xxx）走 Render 私有网络，无需 SSL；
+    // 外部主机名需 sslmode=require 才启用 SSL，避免明文被服务端中断。
+    const useSsl = /sslmode=(require|prefer)|ssl=true/i.test(cs) || /render\.com/i.test(cs);
     pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
+      connectionString: cs,
+      ...(useSsl ? { ssl: { rejectUnauthorized: false } } : {}),
       max: 5,
       idleTimeoutMillis: 30000
     });
