@@ -1,0 +1,389 @@
+{
+  "users": [
+    {
+      "id": "usr_cunftqzuyke",
+      "role": "student",
+      "name": "张明",
+      "phone": "",
+      "createdAt": "2026-08-19T20:06:15.422Z",
+      "studentId": "stu_ukyok9rnibt"
+    },
+    {
+      "id": "usr_sebtlbxvzcq",
+      "role": "teacher",
+      "name": "杨聪",
+      "phone": "",
+      "createdAt": "2026-08-19T20:07:03.098Z"
+    }
+  ],
+  "students": [
+    {
+      "id": "stu_ukyok9rnibt",
+      "userId": null,
+      "name": "张明",
+      "major": "软件工程",
+      "gpa": 3.8,
+      "skills": [
+        "Java",
+        "Spring",
+        "MySQL",
+        "微服务"
+      ],
+      "internship": "阿里云实习",
+      "intention": {
+        "industry": "互联网",
+        "city": "杭州",
+        "type": "研发"
+      },
+      "tags": [
+        "软件工程",
+        "Java",
+        "Spring",
+        "MySQL",
+        "微服务",
+        "学业优秀",
+        "有实习经验",
+        "意向-互联网"
+      ],
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    },
+    {
+      "id": "stu_62au6mynibt",
+      "userId": null,
+      "name": "李雪",
+      "major": "软件工程",
+      "gpa": 3.5,
+      "skills": [
+        "Python",
+        "Django",
+        "数据分析"
+      ],
+      "internship": "字节跳动数据分析实习",
+      "intention": {
+        "industry": "互联网",
+        "city": "北京",
+        "type": "数据"
+      },
+      "tags": [
+        "软件工程",
+        "Python",
+        "Django",
+        "数据分析",
+        "学业良好",
+        "有实习经验",
+        "意向-互联网"
+      ],
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    },
+    {
+      "id": "stu_t73ego5nibt",
+      "userId": null,
+      "name": "王浩",
+      "major": "市场营销",
+      "gpa": 3.2,
+      "skills": [
+        "新媒体运营",
+        "文案策划",
+        "Excel"
+      ],
+      "internship": "京东市场部实习",
+      "intention": {
+        "industry": "快消",
+        "city": "上海",
+        "type": "市场"
+      },
+      "tags": [
+        "市场营销",
+        "新媒体运营",
+        "文案策划",
+        "Excel",
+        "学业一般",
+        "有实习经验",
+        "意向-快消"
+      ],
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    },
+    {
+      "id": "stu_qzxk67gnibt",
+      "userId": null,
+      "name": "陈静",
+      "major": "财务管理",
+      "gpa": 3.9,
+      "skills": [
+        "财务分析",
+        "Excel",
+        "CPA备考"
+      ],
+      "internship": "普华永道审计实习",
+      "intention": {
+        "industry": "金融",
+        "city": "上海",
+        "type": "财务"
+      },
+      "tags": [
+        "财务管理",
+        "财务分析",
+        "Excel",
+        "CPA备考",
+        "学业优秀",
+        "有实习经验",
+        "意向-金融"
+      ],
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    },
+    {
+      "id": "stu_wdj1ejpnibt",
+      "userId": null,
+      "name": "刘洋",
+      "major": "电子信息",
+      "gpa": 3.4,
+      "skills": [
+        "C++",
+        "嵌入式",
+        "硬件调试"
+      ],
+      "internship": "华为硬件实习",
+      "intention": {
+        "industry": "通信",
+        "city": "深圳",
+        "type": "硬件"
+      },
+      "tags": [
+        "电子信息",
+        "C++",
+        "嵌入式",
+        "硬件调试",
+        "学业良好",
+        "有实习经验",
+        "意向-通信"
+      ],
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    },
+    {
+      "id": "stu_oc7yl6snibt",
+      "userId": null,
+      "name": "赵琳",
+      "major": "视觉传达",
+      "gpa": 3.6,
+      "skills": [
+        "UI设计",
+        "Figma",
+        "Photoshop"
+      ],
+      "internship": "腾讯设计实习",
+      "intention": {
+        "industry": "互联网",
+        "city": "深圳",
+        "type": "设计"
+      },
+      "tags": [
+        "视觉传达",
+        "UI设计",
+        "Figma",
+        "Photoshop",
+        "学业良好",
+        "有实习经验",
+        "意向-互联网"
+      ],
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    }
+  ],
+  "enterprises": [
+    {
+      "id": "ent_w9mx4t2nibt",
+      "userId": null,
+      "name": "云启科技",
+      "industry": "互联网",
+      "contact": "王经理 13800000001",
+      "tags": [
+        "互联网"
+      ],
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    },
+    {
+      "id": "ent_qjkylcanibt",
+      "userId": null,
+      "name": "锐进金融",
+      "industry": "金融",
+      "contact": "李总监 13800000002",
+      "tags": [
+        "金融"
+      ],
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    },
+    {
+      "id": "ent_981tl4bnibt",
+      "userId": null,
+      "name": "优创快消",
+      "industry": "快消",
+      "contact": "陈主管 13800000003",
+      "tags": [
+        "快消"
+      ],
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    }
+  ],
+  "positions": [
+    {
+      "id": "pos_8cdkf9mnibt",
+      "enterpriseId": "ent_w9mx4t2nibt",
+      "title": "Java 后端开发",
+      "requirements": "熟悉 Spring 生态，有微服务经验优先",
+      "salary": "15-25k",
+      "skills": [
+        "Java",
+        "Spring",
+        "MySQL"
+      ],
+      "requiredMajors": [
+        "软件工程",
+        "计算机科学"
+      ],
+      "industry": "互联网",
+      "city": "杭州",
+      "tags": [
+        "要求-软件工程",
+        "要求-计算机科学",
+        "要求-Java",
+        "要求-Spring",
+        "要求-MySQL",
+        "行业-互联网",
+        "城市-杭州"
+      ],
+      "status": "open",
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    },
+    {
+      "id": "pos_y4o8ajlnibt",
+      "enterpriseId": "ent_w9mx4t2nibt",
+      "title": "数据分析师",
+      "requirements": "掌握 Python 数据分析，有实习经历优先",
+      "salary": "14-22k",
+      "skills": [
+        "Python",
+        "数据分析",
+        "SQL"
+      ],
+      "requiredMajors": [
+        "软件工程",
+        "统计学",
+        "数学"
+      ],
+      "industry": "互联网",
+      "city": "北京",
+      "tags": [
+        "要求-软件工程",
+        "要求-统计学",
+        "要求-数学",
+        "要求-Python",
+        "要求-数据分析",
+        "要求-SQL",
+        "行业-互联网",
+        "城市-北京"
+      ],
+      "status": "open",
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    },
+    {
+      "id": "pos_vebrkq7nibt",
+      "enterpriseId": "ent_qjkylcanibt",
+      "title": "财务分析专员",
+      "requirements": "财务相关专业，有事务所实习优先",
+      "salary": "12-18k",
+      "skills": [
+        "财务分析",
+        "Excel"
+      ],
+      "requiredMajors": [
+        "财务管理",
+        "会计"
+      ],
+      "industry": "金融",
+      "city": "上海",
+      "tags": [
+        "要求-财务管理",
+        "要求-会计",
+        "要求-财务分析",
+        "要求-Excel",
+        "行业-金融",
+        "城市-上海"
+      ],
+      "status": "open",
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    },
+    {
+      "id": "pos_6n9v8pknibt",
+      "enterpriseId": "ent_981tl4bnibt",
+      "title": "新媒体运营",
+      "requirements": "熟悉新媒体玩法，文案能力强",
+      "salary": "8-12k",
+      "skills": [
+        "新媒体运营",
+        "文案策划"
+      ],
+      "requiredMajors": [
+        "市场营销",
+        "传播学"
+      ],
+      "industry": "快消",
+      "city": "上海",
+      "tags": [
+        "要求-市场营销",
+        "要求-传播学",
+        "要求-新媒体运营",
+        "要求-文案策划",
+        "行业-快消",
+        "城市-上海"
+      ],
+      "status": "open",
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    },
+    {
+      "id": "pos_pb46uvqnibt",
+      "enterpriseId": "ent_w9mx4t2nibt",
+      "title": "UI 设计师",
+      "requirements": "有设计实习作品集优先",
+      "salary": "12-20k",
+      "skills": [
+        "UI设计",
+        "Figma",
+        "Photoshop"
+      ],
+      "requiredMajors": [
+        "视觉传达",
+        "数字媒体"
+      ],
+      "industry": "互联网",
+      "city": "深圳",
+      "tags": [
+        "要求-视觉传达",
+        "要求-数字媒体",
+        "要求-UI设计",
+        "要求-Figma",
+        "要求-Photoshop",
+        "行业-互联网",
+        "城市-深圳"
+      ],
+      "status": "open",
+      "createdAt": "2026-08-19T20:00:27.785Z"
+    }
+  ],
+  "recommendations": [],
+  "pushes": [],
+  "followups": [],
+  "matchRules": {
+    "weights": {
+      "majorExact": 35,
+      "majorRelated": 20,
+      "skill": 35,
+      "gpa": 15,
+      "intIndustry": 8,
+      "intCity": 4,
+      "internship": 8
+    },
+    "thresholds": {
+      "high": 78,
+      "mid": 56
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "campus-employment-system",
+  "version": "1.0.0",
+  "description": "校园就业智能匹配与就业攻坚管理系统 - 网页版 H5 应用（零依赖）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "license": "MIT"
+}

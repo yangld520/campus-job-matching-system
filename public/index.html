@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>校园就业智能匹配系统</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- 登录页 -->
+    <section id="login" class="login">
+      <div class="login-card">
+        <div class="logo">🎓</div>
+        <h1>校园就业智能匹配系统</h1>
+        <p class="sub">智能画像 · 自动匹配 · 双向推荐 · 全流程跟进</p>
+        <div class="roles">
+          <button class="role-btn" data-role="student">🎓 我是学生</button>
+          <button class="role-btn" data-role="enterprise">🏢 我是企业/HR</button>
+          <button class="role-btn" data-role="teacher">🧑‍🏫 我是辅导员</button>
+          <button class="role-btn" data-role="admin">📊 我是管理者</button>
+        </div>
+        <input id="nameInput" placeholder="请输入你的姓名（如：张明）" />
+        <button id="loginBtn" class="primary">进入系统</button>
+        <p class="tip">演示提示：学生/企业可用种子数据中的姓名直接登录（如 张明 / 云启科技）。</p>
+      </div>
+    </section>
+
+    <!-- 主应用 -->
+    <section id="main" class="hidden">
+      <header class="topbar">
+        <div class="tb-left">
+          <span class="sys">就业攻坚系统</span>
+          <span id="roleTag" class="role-tag"></span>
+        </div>
+        <div class="tb-right">
+          <span id="userName" class="uname"></span>
+          <button id="logoutBtn" class="ghost">退出</button>
+        </div>
+      </header>
+      <main id="view" class="view"></main>
+      <nav id="nav" class="bottom-nav"></nav>
+    </section>
+  </div>
+  <script src="/js/app.js"></script>
+</body>
+</html>
