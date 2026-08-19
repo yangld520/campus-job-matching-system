@@ -148,7 +148,8 @@ function buildDashboard() {
     funnel,
     byMajor: Object.entries(byMajor).map(([major, v]) => ({ major, ...v })),
     entRank,
-    risk
+    risk,
+    storage: db.usingDatabase() ? 'postgres' : 'file'
   };
 }
 
@@ -308,6 +309,12 @@ const server = http.createServer(async (req, res) => {
   serveStatic(req, res, pathname);
 });
 
-server.listen(PORT, () => {
-  console.log(`✅ 校园就业系统已启动: http://localhost:${PORT}`);
+db.init().then(() => {
+  server.listen(PORT, () => {
+    console.log(`✅ 校园就业系统已启动: http://localhost:${PORT}`);
+    console.log(process.env.DATABASE_URL ? '🗄️  已启用 Postgres 数据库持久化' : '📄 使用本地 JSON 文件存储');
+  });
+}).catch(err => {
+  console.error('❌ 初始化失败:', err);
+  process.exit(1);
 });

@@ -1,6 +1,6 @@
 # 校园就业智能匹配与就业攻坚管理系统（网页版 H5）
 
-零依赖（纯 Node 内置模块）的全栈应用，覆盖「智能画像 → 自动匹配 → 双向推荐 → 跟进签约 → 数据看板」全流程。开箱即用，无需 `npm install`。
+零依赖（纯 Node 内置模块 + 可选 PostgreSQL）的全栈应用，覆盖「智能画像 → 自动匹配 → 双向推荐 → 跟进签约 → 数据看板」全流程。部署到 Render 后通过 PostgreSQL 实现数据持久化；未配置 `DATABASE_URL` 时自动降级为本地 JSON 文件，开发调试开箱即用。
 
 ## 本地运行
 ```bash
@@ -36,14 +36,31 @@ npx cloudflared tunnel --url http://localhost:3000
 ```
 > 注意：临时链接依赖本机开机与进程运行，关机即失效，仅适合现场演示。
 
+## 数据持久化（数据库）
+系统数据层 `db.js` 采用**「PostgreSQL 优先 + 本地 JSON 文件自动降级」**策略：
+
+- **生产环境**（已配置 `DATABASE_URL`）：整套状态以 JSONB 存入 PostgreSQL 的 `app_state` 大字段表中，重启/重新部署后数据不丢失。
+- **本地/未配置数据库**：自动使用 `data.json` 文件存储，无需数据库即可开发调试。
+
+### 在 Render 上使用已附带的数据库
+本项目已为你创建好 Render Postgres 实例，并在 web 服务中注入 `DATABASE_URL`，**部署即自动启用持久化**，无需额外操作。`DATABASE_URL` 连接的是免费实例，长期无人访问会暂停，首次访问需等待恢复（约几十秒）。
+
+如自行搭建，需：
+1. 创建 Postgres（任意托管商），拿到连接串。
+2. 在运行环境设置 `DATABASE_URL=postgresql://user:pass@host:5432/dbname`（建议加 `?sslmode=require`）。
+3. 安装依赖：`npm install`（会装入 `pg` 驱动）。
+4. 启动：`node server.js`，会自动建表并播种种子数据。
+
+> 切换数据库后，原 `data.json` 文件内容不会自动合并；数据库为空时系统会按种子数据初始化。可通过 `POST /api/reset` 重置为演示数据。
+
 ## 目录结构
 ```
 app/
-├── server.js        # 零依赖 HTTP 服务 + REST API + 静态资源
-├── db.js            # JSON 文件数据层（含种子数据）
+├── server.js        # HTTP 服务 + REST API + 静态资源（启动前 await db.init()）
+├── db.js            # 数据层：PostgreSQL 适配器（含 JSON 文件降级 + 种子数据）
 ├── matcher.js       # 标准化匹配度计算模型
-├── data.json        # 运行期自动生成的数据文件
-├── package.json
+├── data.json        # 无数据库时的本地存储（已 gitignore）
+├── package.json     # 生产依赖含 pg
 ├── Procfile / render.yaml  # 公网部署配置
 └── public/          # 前端 SPA（HTML/CSS/JS，移动端优先）
 ```
@@ -55,5 +72,5 @@ app/
 - `GET /api/recommendations?role=&studentId=/enterpriseId=` 推荐列表
 - `POST /api/recommendations/:id/feedback` 双向反馈（学生/企业）
 - `POST /api/recommendations/:id/followup` 面试/签约跟进
-- `GET /api/dashboard` 看板指标、转化漏斗、企业排行、风险标记
+- `GET /api/dashboard` 看板指标、转化漏斗、企业排行、风险标记（含 `storage` 字段标明当前存储类型 `postgres`/`json`）
 - `POST /api/reset` 重置演示数据

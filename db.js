@@ -1,8 +1,14 @@
-// db.js —— 零依赖 JSON 文件数据层
+// db.js —— 数据层：Postgres 优先，本地 JSON 文件自动降级
+// 设计要点：
+//   1) 生产环境（设置了 DATABASE_URL）优先使用 Postgres，整份状态以 JSONB 存于单行
+//   2) 若 Postgres 不可用（网络/配置异常），自动降级到本地 JSON 文件，服务不因此中断
+//   3) load()/save() 维持同步语义，server.js 与 matcher.js 的业务逻辑无需改动
 const fs = require('fs');
 const path = require('path');
 
 const DATA_FILE = path.join(__dirname, 'data.json');
+let cache = null;      // 内存中的单一状态对象
+let pool = null;       // pg 连接池（懒加载）
 
 function now() { return new Date().toISOString(); }
 function gid(prefix) { return prefix + '_' + Math.random().toString(36).slice(2, 9) + Date.now().toString(36).slice(-4); }
@@ -21,34 +27,9 @@ const defaultData = () => ({
   }
 });
 
-let cache = null;
-
-function load() {
-  if (cache) return cache;
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      cache = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-    } else {
-      cache = defaultData();
-      seed(cache);
-      save();
-    }
-  } catch (e) {
-    cache = defaultData();
-    seed(cache);
-    save();
-  }
-  return cache;
-}
-
-function save() {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(cache, null, 2), 'utf8');
-}
-
 // ---- 种子数据：让系统开箱即用 ----
 function seed(db) {
   const t = now();
-  // 学生
   const stu = [
     { name: '张明', major: '软件工程', gpa: 3.8, skills: ['Java', 'Spring', 'MySQL', '微服务'], internship: '阿里云实习', intention: { industry: '互联网', city: '杭州', type: '研发' } },
     { name: '李雪', major: '软件工程', gpa: 3.5, skills: ['Python', 'Django', '数据分析'], internship: '字节跳动数据分析实习', intention: { industry: '互联网', city: '北京', type: '数据' } },
@@ -57,13 +38,12 @@ function seed(db) {
     { name: '刘洋', major: '电子信息', gpa: 3.4, skills: ['C++', '嵌入式', '硬件调试'], internship: '华为硬件实习', intention: { industry: '通信', city: '深圳', type: '硬件' } },
     { name: '赵琳', major: '视觉传达', gpa: 3.6, skills: ['UI设计', 'Figma', 'Photoshop'], internship: '腾讯设计实习', intention: { industry: '互联网', city: '深圳', type: '设计' } }
   ];
-  stu.forEach((s, i) => {
+  stu.forEach((s) => {
     const id = gid('stu');
     const tags = buildStudentTags(s);
     db.students.push({ id, userId: null, name: s.name, major: s.major, gpa: s.gpa, skills: s.skills, internship: s.internship, intention: s.intention, tags, createdAt: t });
   });
 
-  // 企业
   const ent = [
     { name: '云启科技', industry: '互联网', contact: '王经理 13800000001' },
     { name: '锐进金融', industry: '金融', contact: '李总监 13800000002' },
@@ -76,7 +56,6 @@ function seed(db) {
     db.enterprises.push({ id, userId: null, name: e.name, industry: e.industry, contact: e.contact, tags: [e.industry], createdAt: t });
   });
 
-  // 岗位
   const pos = [
     { enterprise: '云启科技', title: 'Java 后端开发', salary: '15-25k', skills: ['Java', 'Spring', 'MySQL'], requiredMajors: ['软件工程', '计算机科学'], industry: '互联网', city: '杭州', requirements: '熟悉 Spring 生态，有微服务经验优先' },
     { enterprise: '云启科技', title: '数据分析师', salary: '14-22k', skills: ['Python', '数据分析', 'SQL'], requiredMajors: ['软件工程', '统计学', '数学'], industry: '互联网', city: '北京', requirements: '掌握 Python 数据分析，有实习经历优先' },
@@ -110,9 +89,94 @@ function buildPositionTags(p) {
   return tags;
 }
 
+// ---------- 持久化 ----------
+function getPool() {
+  if (!pool) {
+    const { Pool } = require('pg');
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      max: 5,
+      idleTimeoutMillis: 30000
+    });
+    pool.on('error', (e) => console.error('[db] pool error:', e.message));
+  }
+  return pool;
+}
+
+async function persist() {
+  if (!cache) return;
+  if (pool) {
+    const sql = `INSERT INTO app_state(id, data, updated_at) VALUES(1, $1, now())
+                 ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`;
+    await pool.query(sql, [JSON.stringify(cache)]);
+  } else {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(cache, null, 2), 'utf8');
+  }
+}
+
+// 初始化：连接数据库并加载数据到内存；失败则降级到本地文件
+async function init() {
+  if (process.env.DATABASE_URL) {
+    try {
+      const p = getPool();
+      await p.query(`CREATE TABLE IF NOT EXISTS app_state (
+        id INT PRIMARY KEY,
+        data JSONB NOT NULL,
+        updated_at TIMESTAMPTZ DEFAULT now()
+      )`);
+      const r = await p.query('SELECT data FROM app_state WHERE id = 1');
+      if (r.rows.length && r.rows[0].data) {
+        cache = r.rows[0].data;
+        const keys = Object.keys(cache).length;
+        console.log(`[db] ✅ 已从 Postgres 加载数据 (${keys} 类业务对象)`);
+      } else {
+        cache = defaultData();
+        seed(cache);
+        await persist();
+        console.log('[db] ✅ 已写入种子数据到 Postgres');
+      }
+      return;
+    } catch (e) {
+      console.error('[db] ⚠️ Postgres 不可用，降级到本地 JSON 文件:', e.message);
+      pool = null;
+    }
+  }
+  // 文件兜底
+  try {
+    if (fs.existsSync(DATA_FILE)) cache = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+    else { cache = defaultData(); seed(cache); fs.writeFileSync(DATA_FILE, JSON.stringify(cache, null, 2)); }
+  } catch (e) {
+    console.error('[db] 文件加载失败，使用内存种子:', e.message);
+    cache = defaultData(); seed(cache);
+  }
+}
+
+function load() {
+  if (!cache) {
+    try {
+      if (fs.existsSync(DATA_FILE)) cache = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+      else { cache = defaultData(); seed(cache); }
+    } catch (e) { cache = defaultData(); seed(cache); }
+  }
+  return cache;
+}
+
+// save() 维持「改完内存立即返回」的同步语义；落库/落盘在后台完成
+function save() {
+  if (!cache) return cache;
+  if (pool) {
+    persist().catch(e => console.error('[db] 持久化失败:', e.message));
+  } else {
+    try { fs.writeFileSync(DATA_FILE, JSON.stringify(cache, null, 2), 'utf8'); }
+    catch (e) { console.error('[db] 文件写入失败:', e.message); }
+  }
+  return cache;
+}
+
 // 对外暴露
 module.exports = {
-  load, save, gid, now,
+  init, load, save, gid, now,
   buildStudentTags, buildPositionTags,
   // 简单查询助手
   all: (key) => load()[key],
@@ -132,5 +196,6 @@ module.exports = {
     if (i >= 0) { db[key].splice(i, 1); save(); return true; }
     return false;
   },
-  reset: () => { cache = defaultData(); seed(cache); save(); return cache; }
+  reset: () => { cache = defaultData(); seed(cache); save(); return cache; },
+  usingDatabase: () => !!pool
 };
